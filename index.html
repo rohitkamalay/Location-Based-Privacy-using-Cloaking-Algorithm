@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Based Privacy</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<style>
+    #map {
+    height: 500px;
+    width: 100%;
+    }
+.form {
+    margin: 15px;
+    }
+    #jb {
+    height: 27vh;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+<div id="jb">
+<div class="jumbotron text-center" id="txt" style="background: #64d2e972;">
+<h2><u><b>Location Based Privacy Using Cloaking Algorithm</b></u><h2>
+    <p><i>Designed by </i> <b>Rohit Kamalay</b></p>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
+integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
+crossorigin=""/>
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"
+integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg="
+crossorigin=""></script>
+
+<style>
+#map { height: 400px;}
+</style>
+<main>
+<div id="map"></div>
+</main>
+
+<script>
+const map = L.map('map'); 
+// Initializes map
+map.setView([0, 0], 13); 
+// Sets initial coordinates and zoom level
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+maxZoom: 19,
+attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map); 
+// Sets map data source and associates with map
+let circle, zoomed;
+navigator.geolocation.watchPosition(success, error);
+function success(pos) {
+const lat = (pos.coords.latitude) + 0.002;
+const lng = (pos.coords.longitude) - 0.002;
+const accuracy = pos.coords.accuracy;
+if (circle) {
+// map.removeLayer(marker);
+map.removeLayer(circle);
+}
+// Removes any existing marker and circle (new ones about to be set)
+// marker = L.marker([lat, lng]).addTo(map);
+circle = L.circle([lat, lng], { radius: accuracy +500}).addTo(map);
+// Adds marker to the map and a circle for accuracy
+if (!zoomed) {
+zoomed = map.fitBounds(circle.getBounds()); 
+}
+// Set zoom to boundaries of accuracy circle
+map.setView([lat, lng]);
+// Set map focus to current user position
+}
+function error(err) {
+if (err.code === 1) {
+alert("Please allow geolocation access");
+} else {
+alert("Cannot get current location");
+}
+}
+</script>
+
+
+<div id="output"></div>
+<script>
+const options = {
+enableHighAccuracy: false, 
+// Get high accuracy reading, if available (default false)
+timeout: 5000, 
+// Time to return a position successfully before error (default infinity)
+maximumAge: 5000, 
+// Milliseconds for which it is acceptable to use cached position (default 0)
+};
+navigator.geolocation.watchPosition(success, error, options);
+// Fires success function immediately and when user position changes
+function success(pos) {
+const lat = pos.coords.latitude;
+const lng = pos.coords.longitude;
+const accuracy = pos.coords.accuracy; // Accuracy in metres
+document.getElementById('output').innerText = `
+User coordinates: 
+Latitude ${lat}.
+Longitude ${lng}.
+Estimation accurate within ${(accuracy)} metres.`;
+}
+function error(err) {
+if (err.code === 1) {
+alert("Please allow geolocation access");
+// Runs if user refuses access
+} else {
+alert("Cannot get current location");
+// Runs if there was a technical problem.
+}
+}
+</script>
+</body>
+</html>
